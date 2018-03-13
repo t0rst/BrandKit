@@ -4,4 +4,10 @@
    <FileRef
       location = "container:BrandKit.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:Carthage/Checkouts/CwlUtils/CwlUtils.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Carthage/Checkouts/T0Utils/T0Utils.xcodeproj">
+   </FileRef>
 </Workspace>
