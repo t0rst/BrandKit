@@ -474,15 +474,31 @@ open class Brand : NSObject
 		let prefix:			(String)->String
 	}
 
-	open func parameterAccessor(_ kind: ParameterKind) -> BrandParameterAccessor {
+	open func parameterAccessor(_ kind: ParameterKind, indirect: Bool = true) -> BrandParameterAccessor {
 		if let brandData = data {
-			if let parameter = brandData.otherParameters[kind.rawValue] {
+			if var parameter = brandData.otherParameters[kind.rawValue] {
+				while indirect, case .string(let s) = parameter.raw {
+					guard let p = brandData.otherParameters[s] else { break }
+					parameter = p
+				}
 				return ParameterAccessor(entry: parameter, brand: self, prefix: {$0})
 			} else {
 				BKLog.error("brand.parameter(\"\(kind.rawValue)\") could not find entry")
 			}
 		}
 		return Brand.`default`.parameterAccessor(kind)
+	}
+
+	fileprivate func indirectParameterAccessor(at keyPath: String, in pa: BrandParameterAccessor)
+	 -> BrandParameterAccessor? {
+		guard let brandData = data else { return nil }
+		var result: BrandParameterAccessor? = nil
+	 	var a = pa
+	 	while let s = a.string(at: keyPath), let p = brandData.otherParameters[s] {
+			a = ParameterAccessor(entry: p, brand: self, prefix: {$0})
+			result = a
+		}
+		return result
 	}
 
 	open func parameter(_ kind: ParameterKind) -> AnyJSONObject {
@@ -501,6 +517,7 @@ open class Brand : NSObject
 
 // MARK: -
 public protocol BrandParameterAccessor {
+	var brand: Brand { get }
 	func object(at keyPath: String) -> AnyJSONObject?
 	func string(at keyPath: String) -> String?
 	func int(at keyPath: String) -> Int?
@@ -539,7 +556,8 @@ extension Brand.ParameterAccessor {
 	func color(at keyPath: String) -> UIColor? 			{ return entry.color(at: prefix(keyPath), using: brand) }
 	func accessor(at keyPath: String) -> BrandParameterAccessor {
 		guard !keyPath.isEmpty else { return self }
-		let p = keyPath.appending(".")
+		if let accessor = brand.indirectParameterAccessor(at: keyPath, in: self) { return accessor }
+		let p = prefix(keyPath).appending(".")
 		return Brand.ParameterAccessor.init(entry: entry, brand: brand, prefix: {p.appending($0)})
 	}
 }
