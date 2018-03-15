@@ -652,11 +652,15 @@ extension Brand
 					values.append(value)
 					dependees.append(contentsOf: deps)
 				}
-			default:
-				guard let (vals, deps) = extractMetrics(count: requested, from: jso, using: others, expecting: expecting)
+			case .string(let s):
+				guard let (vals, deps) = extractMetrics(count: requested, from: s, using: others, expecting: expecting)
 				else { return nil }
 				values.append(contentsOf: vals)
 				dependees.append(contentsOf: deps)
+			default:
+				guard let value = jso.asDouble
+				else { return nil }
+				values.append(CGFloat(value))
 		}
 		guard values.count == requested || requested == Int.max
 		else { return nil }
