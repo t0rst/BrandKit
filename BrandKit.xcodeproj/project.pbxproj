@@ -33,6 +33,7 @@
 		AE9F4F0E20584A6100C8DD98 /* TestImage_512@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = AE9F4EFD20584A5400C8DD98 /* TestImage_512@2x.png */; };
 		AE9F4F0F20584A6100C8DD98 /* TestImage_1024.png in Resources */ = {isa = PBXBuildFile; fileRef = AE9F4F0020584A5400C8DD98 /* TestImage_1024.png */; };
 		AE9F4F1020584A6100C8DD98 /* TestImage.empty in Resources */ = {isa = PBXBuildFile; fileRef = AE9F4F0120584A5400C8DD98 /* TestImage.empty */; };
+		AEFDE4EA205CF8E6004EE87F /* BrandViewHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEFDE4E9205CF8E5004EE87F /* BrandViewHelpers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,6 +76,7 @@
 		AE9F4EFF20584A5400C8DD98 /* TestImage_512.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = TestImage_512.png; sourceTree = "<group>"; };
 		AE9F4F0020584A5400C8DD98 /* TestImage_1024.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = TestImage_1024.png; sourceTree = "<group>"; };
 		AE9F4F0120584A5400C8DD98 /* TestImage.empty */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = TestImage.empty; sourceTree = "<group>"; };
+		AEFDE4E9205CF8E5004EE87F /* BrandViewHelpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandViewHelpers.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -197,6 +199,7 @@
 				AE9F4EE720582A4C00C8DD98 /* Brand.swift */,
 				AE9F4EE520582A4B00C8DD98 /* BrandApply.swift */,
 				AE9F4EE620582A4C00C8DD98 /* BrandData.swift */,
+				AEFDE4E9205CF8E5004EE87F /* BrandViewHelpers.swift */,
 			);
 			path = Brand;
 			sourceTree = "<group>";
@@ -405,6 +408,7 @@
 			files = (
 				AE9F4EE820582A4C00C8DD98 /* BrandApply.swift in Sources */,
 				AE9F4EEA20582A4C00C8DD98 /* Brand.swift in Sources */,
+				AEFDE4EA205CF8E6004EE87F /* BrandViewHelpers.swift in Sources */,
 				AE9F4EE920582A4C00C8DD98 /* BrandData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
