@@ -33,6 +33,14 @@ import T0Utils
 
 
 
+public typealias UIViewBrandingParams = UIView.ViewBrandingParams
+public typealias UIStackViewBrandingParams = UIStackView.StackViewBrandingParams
+public typealias UICollectionViewBrandingParams = UICollectionView.CollectionViewBrandingParams
+public typealias UICollectionViewCellBrandingParams = UICollectionViewCell.CellBrandingParams
+public typealias UICollectionViewFlowLayoutBrandingParams = UICollectionViewFlowLayout.FlowLayoutBrandingParams
+
+
+
 extension UIView
 {
 	public struct ViewBrandingParams {
@@ -109,18 +117,16 @@ extension UICollectionViewCell
 
 
 // MARK: -
-extension UICollectionView
+extension UICollectionViewFlowLayout
 {
-	public struct CollectionViewBrandingParams {
-		public var view:			UIView.ViewBrandingParams? = nil
-		public var contentInset:	UIEdgeInsets = .zero
-		// Params for use with UICollectionViewFlowLayout:
+	public struct FlowLayoutBrandingParams {
 		public var scrollDirection:	UICollectionViewScrollDirection = .vertical
 		public var itemGap:			CGFloat = 0 // gap in fit direction
 		public var lineGap:			CGFloat = 0 // gap in scroll direction
 		public var header:			CGFloat? = nil // header dimension in scroll direction
 		public var footer:			CGFloat? = nil // header dimension in scroll direction
-		// itemSize and itemCount used for FlowLayoutSizingRequest - see its description
+		// itemSize and itemCount are used for FlowLayoutSizingRequest (-> request explicit or
+		// fitting sizes) - see its description
 		public var itemSize:		CGSize = .zero
 		public var itemCount:		CGSize = .zero
 
@@ -130,59 +136,81 @@ extension UICollectionView
 		}
 
 		public init(_ accessor: BrandParameterAccessor) {
-			let bp = ViewBrandingParams(accessor.accessor(at: "view"))
-			view = bp.needApply ? bp : nil
-			contentInset = accessor.insets(at: "contentInset") ?? .zero
-			switch (accessor.string(at: "scrollDirection") ?? "v").lowercased() {
-				case "h", "horz", "horizontal":		scrollDirection = .horizontal
-				case "v", "vert", "vertical":		scrollDirection = .vertical
-				default:	BKLog.error("BrowserVC.FlowLayoutParams rejecting scrollDirection, expected \"h\", \"horz\", \"horizontal\", \"v\", \"vert\", or \"vertical\"")
-			}
+			scrollDirection = UICollectionViewScrollDirection(accessor.string(at: "scrollDirection") ?? "v") ?? .vertical
 			lineGap = accessor.float(at: "lineGap") ?? 0
 			itemGap = accessor.float(at: "itemGap") ?? 0
 			header = accessor.float(at: "header")
 			footer = accessor.float(at: "footer")
 			itemSize = accessor.size(at: "itemSize") ?? .zero
 			itemCount = accessor.size(at: "itemCount") ?? .zero
-			BKLog.warningIf(itemSize.width != 0 && itemCount.width != 0, "CollectionViewBrandingParams column count (itemCount.width) of \(itemCount.width) will be ignored in favour of explicit itemSize.width of \(itemSize.width)")
-			BKLog.warningIf(itemSize.height != 0 && itemCount.height != 0, "CollectionViewBrandingParams row count (itemCount.height) of \(itemCount.height) will be ignored in favour of explicit itemSize.height of \(itemSize.height)")
+			BKLog.warningIf(itemSize.width != 0 && itemCount.width != 0, "FlowLayoutBrandingParams column count (itemCount.width) of \(itemCount.width) will be ignored in favour of explicit itemSize.width of \(itemSize.width)")
+			BKLog.warningIf(itemSize.height != 0 && itemCount.height != 0, "FlowLayoutBrandingParams row count (itemCount.height) of \(itemCount.height) will be ignored in favour of explicit itemSize.height of \(itemSize.height)")
 			BKLog.warningIf(
-				scrollDirection == .horizontal && itemSize.width == 0 && itemCount.width != round(itemCount.width),
-				"CollectionViewBrandingParams row count must be integral scrolling horizontally - \(max(1,round(itemCount.width))) rows will be used instead of \(itemCount.width) (itemCount.width)")
+				scrollDirection == .vertical && itemSize.width == 0 && itemCount.width != round(itemCount.width),
+				"FlowLayoutBrandingParams column count must be integral scrolling vertically - \(max(1,round(itemCount.width))) columns will be used instead of \(itemCount.width) (itemCount.width)")
 			BKLog.warningIf(
-				scrollDirection == .vertical && itemSize.height == 0 && itemCount.height != round(itemCount.height),
-				"CollectionViewBrandingParams column count must be integral scrolling vertically - \(max(1,round(itemCount.height))) columns will be used instead of \(itemCount.height) (itemCount.height)")
+				scrollDirection == .horizontal && itemSize.height == 0 && itemCount.height != round(itemCount.height),
+				"FlowLayoutBrandingParams row count must be integral scrolling horizontally - \(max(1,round(itemCount.height))) rows will be used instead of \(itemCount.height) (itemCount.height)")
+		}
+
+		public func apply(to fl: UICollectionViewFlowLayout) {
+			BKLog.warningIf(nil == fl.collectionView && (itemSize.width == 0 || itemSize.height == 0),
+				"FlowLayoutBrandingParams cannot evaluate dynamic item sizes (= fit rows/cols to collection view area) until layout is installed in a collection view")
+
+			fl.scrollDirection = scrollDirection
+			fl.minimumLineSpacing = lineGap
+			fl.minimumInteritemSpacing = itemGap
+
+			var size = fl.itemSize
+			if let header = header { switch scrollDirection {
+				case .vertical:		fl.headerReferenceSize = CGSize(width: size.width, height: header)
+				case .horizontal:	fl.headerReferenceSize = CGSize(width: header, height: size.height)
+			} }
+			if let footer = footer { switch scrollDirection {
+				case .vertical:		fl.headerReferenceSize = CGSize(width: size.width, height: footer)
+				case .horizontal:	fl.headerReferenceSize = CGSize(width: footer, height: size.height)
+			} }
+
+			let sizingRequest = FlowLayoutSizingRequest(sizes: itemSize, counts: itemCount)
+			size = fl.dynamicItemSize(for: sizingRequest)
+			fl.itemSize = size
+
+			if let header = header { switch scrollDirection {
+				case .vertical:		fl.headerReferenceSize = CGSize(width: size.width, height: header)
+				case .horizontal:	fl.headerReferenceSize = CGSize(width: header, height: size.height)
+			} }
+			if let footer = footer { switch scrollDirection {
+				case .vertical:		fl.headerReferenceSize = CGSize(width: size.width, height: footer)
+				case .horizontal:	fl.headerReferenceSize = CGSize(width: footer, height: size.height)
+			} }
+		}
+	}
+}
+
+
+
+// MARK: -
+extension UICollectionView
+{
+	public struct CollectionViewBrandingParams {
+		public var view:			UIView.ViewBrandingParams? = nil
+		public var contentInset:	UIEdgeInsets = .zero
+		public var flowLayout:		UICollectionViewFlowLayoutBrandingParams? = nil
+
+		public init(view v: UIView.ViewBrandingParams? = nil, contentInset c: UIEdgeInsets = .zero, flowLayout f: UICollectionViewFlowLayoutBrandingParams? = nil) { view = v ; contentInset = c ; flowLayout = f }
+		public init(_ accessor: BrandParameterAccessor) {
+			let bp = ViewBrandingParams(accessor.accessor(at: "view"))
+			view = bp.needApply ? bp : nil
+			contentInset = accessor.insets(at: "contentInset") ?? .zero
+			flowLayout = UICollectionViewFlowLayoutBrandingParams(accessor.accessor(at: "flowLayout"))
 		}
 
 		public func apply(to cv: UICollectionView, constraints: (w: NSLayoutConstraint, h: NSLayoutConstraint)? = nil) {
+			view?.apply(to: cv)
 			cv.contentInset = contentInset
-			if let fl = cv.collectionViewLayout as? UICollectionViewFlowLayout {
-				fl.scrollDirection = scrollDirection
-				fl.minimumLineSpacing = lineGap
-				fl.minimumInteritemSpacing = itemGap
 
-				var size = fl.itemSize
-				if let header = header { switch scrollDirection {
-					case .vertical:		fl.headerReferenceSize = CGSize(width: size.width, height: header)
-					case .horizontal:	fl.headerReferenceSize = CGSize(width: header, height: size.height)
-				} }
-				if let footer = footer { switch scrollDirection {
-					case .vertical:		fl.headerReferenceSize = CGSize(width: size.width, height: footer)
-					case .horizontal:	fl.headerReferenceSize = CGSize(width: footer, height: size.height)
-				} }
-
-				let sizingRequest = FlowLayoutSizingRequest(sizes: itemSize, counts: itemCount)
-				size = fl.dynamicItemSize(for: sizingRequest)
-				fl.itemSize = size
-
-				if let header = header { switch scrollDirection {
-					case .vertical:		fl.headerReferenceSize = CGSize(width: size.width, height: header)
-					case .horizontal:	fl.headerReferenceSize = CGSize(width: header, height: size.height)
-				} }
-				if let footer = footer { switch scrollDirection {
-					case .vertical:		fl.headerReferenceSize = CGSize(width: size.width, height: footer)
-					case .horizontal:	fl.headerReferenceSize = CGSize(width: footer, height: size.height)
-				} }
+			if	let fl = cv.collectionViewLayout as? UICollectionViewFlowLayout {
+				flowLayout?.apply(to: fl)
 
 				if let (cw, ch) = constraints {
 					cw.isActive = fl.scrollDirection == .vertical
@@ -195,7 +223,46 @@ extension UICollectionView
 					}
 				}
 			}
-			view?.apply(to: cv)
+		}
+	}
+}
+
+
+
+
+// MARK: -
+extension UIStackView
+{
+	public struct StackViewBrandingParams {
+		var axis:			UILayoutConstraintAxis? = nil
+		var alignment:		UIStackViewAlignment? = nil
+		var distribution:	UIStackViewDistribution? = nil
+		var clustering:		T0StackViewClustering = .none
+		var spacing:		CGFloat? = nil
+		public init(){}
+		public init(_ accessor: BrandParameterAccessor) {
+			axis = UILayoutConstraintAxis(accessor.string(at: "axis") ?? "")
+			alignment = UIStackViewAlignment(accessor.string(at: "alignment") ?? "")
+			distribution = UIStackViewDistribution(accessor.string(at: "distribution") ?? "")
+			clustering = T0StackViewClustering(accessor.string(at: "clustering") ?? "") ?? .none
+			spacing = accessor.float(at: "spacing")
+		}
+		public func apply(to sv: UIStackView) {
+			if let axis = axis {
+				sv.axis = axis
+			}
+			if let alignment = alignment {
+				sv.alignment = alignment
+			}
+			if let distribution = distribution {
+				sv.distribution = distribution
+			}
+			if let spacing = spacing {
+				sv.spacing = spacing
+			}
+			if let sv = sv as? T0StackView {
+				sv.clustering = clustering
+			}
 		}
 	}
 }
