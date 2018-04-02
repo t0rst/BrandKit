@@ -238,6 +238,7 @@ extension UIStackView
 		var alignment:		UIStackViewAlignment? = nil
 		var distribution:	UIStackViewDistribution? = nil
 		var clustering:		T0StackViewClustering = .none
+		var margins:		UIEdgeInsets? = nil
 		var spacing:		CGFloat? = nil
 		public init(){}
 		public init(_ accessor: BrandParameterAccessor) {
@@ -245,6 +246,7 @@ extension UIStackView
 			alignment = UIStackViewAlignment(accessor.string(at: "alignment") ?? "")
 			distribution = UIStackViewDistribution(accessor.string(at: "distribution") ?? "")
 			clustering = T0StackViewClustering(accessor.string(at: "clustering") ?? "") ?? .none
+			margins = accessor.insets(at: "margins")
 			spacing = accessor.float(at: "spacing")
 		}
 		public func apply(to sv: UIStackView) {
@@ -259,6 +261,10 @@ extension UIStackView
 			}
 			if let spacing = spacing {
 				sv.spacing = spacing
+			}
+			if let margins = margins {
+				sv.layoutMargins = margins
+				sv.isLayoutMarginsRelativeArrangement = true
 			}
 			if let sv = sv as? T0StackView {
 				sv.clustering = clustering
