@@ -329,6 +329,8 @@ open class Brand : NSObject
 			case let f as UITextView:
 				f.attributedText = NSAttributedString(string: t ?? f.text ?? "", attributes: ta)
 			case let f as Unified.TextField:
+				let sa = [String:Any](uniqueKeysWithValues: ta.lazy.map({kv in return (kv.key.rawValue, kv.value)}))
+				f.defaultTextAttributes = sa
 				f.attributedText = NSAttributedString(string: t ?? f.text ?? "", attributes: ta)
 			default:
 				break
