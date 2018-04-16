@@ -47,13 +47,15 @@ extension UIView
 		public var backgroundColor:	UIColor? = nil
 		public var borderColor:		UIColor? = nil
 		public var borderWidth:		CGFloat = 0
+		public var margins:			UIEdgeInsets? = nil
 		public init(){}
 		public init(_ accessor: BrandParameterAccessor) {
 			backgroundColor = accessor.color(at: "backgroundColor")
 			borderColor = accessor.color(at: "borderColor")
 			borderWidth = accessor.float(at: "borderWidth") ?? 0
+			margins = accessor.insets(at: "margins")
 		}
-		public var needApply: Bool { return backgroundColor != nil || needBorder }
+		public var needApply: Bool { return backgroundColor != nil || needBorder || margins != nil }
 		public var needBorder: Bool { return borderWidth != 0 && borderColor != nil && borderColor != .clear }
 		public var needBackground: Bool { return backgroundColor != nil && backgroundColor != .clear }
 		public func apply(to view: UIView) {
@@ -63,6 +65,9 @@ extension UIView
 			if borderWidth != 0, let bgc = borderColor?.cgColor {
 				view.layer.borderWidth = fabs(borderWidth)
 				view.layer.borderColor = bgc
+			}
+			if let margins = margins {
+				view.layoutMargins = margins
 			}
 		}
 	}
@@ -234,12 +239,12 @@ extension UICollectionView
 extension UIStackView
 {
 	public struct StackViewBrandingParams {
-		var axis:			UILayoutConstraintAxis? = nil
-		var alignment:		UIStackViewAlignment? = nil
-		var distribution:	UIStackViewDistribution? = nil
-		var clustering:		T0StackViewClustering = .none
-		var margins:		UIEdgeInsets? = nil
-		var spacing:		CGFloat? = nil
+		public var axis:			UILayoutConstraintAxis? = nil
+		public var alignment:		UIStackViewAlignment? = nil
+		public var distribution:	UIStackViewDistribution? = nil
+		public var clustering:		T0StackViewClustering = .none
+		public var margins:			UIEdgeInsets? = nil
+		public var spacing:			CGFloat? = nil
 		public init(){}
 		public init(_ accessor: BrandParameterAccessor) {
 			axis = UILayoutConstraintAxis(accessor.string(at: "axis") ?? "")
