@@ -228,7 +228,7 @@ extension Unified.View
 			let constraintArrayForKey = constraintArraysByKey[key]
 		{
 			// get the refs that are still alive out of the weak ref containers
-			constraints = constraintArrayForKey.flatMap { $0.value }
+			constraints = constraintArrayForKey.compactMap { $0.value }
 		}
 		return constraints
 	}
@@ -241,14 +241,14 @@ extension Unified.View
 		var constraints = [NSLayoutConstraint]()
 		var update = false
 		if let key = key, let constraintArrayForKey = constraintArraysByKey[key] {
-			constraints = constraintArrayForKey.flatMap { $0.value }
+			constraints = constraintArrayForKey.compactMap { $0.value }
 			constraintArraysByKey[key] = nil
 			self.superview?.removeConstraints(constraints)
 			update = true
 		}
 		if nil == key {
 			for (_, constraintArrayForKey) in constraintArraysByKey {
-				constraints = constraintArrayForKey.flatMap { $0.value }
+				constraints = constraintArrayForKey.compactMap { $0.value }
 				self.superview?.removeConstraints(constraints)
 				update = true
 			}

@@ -899,7 +899,7 @@ extension Brand
 
 		if let a = entry.attributes?.asObject as? Dictionary<String, Any> {
 			var reject = false
-			let pairs = a.flatMap { (kv) -> (Unified.FontDescriptorAttributes.Key,Any)? in
+			let pairs = a.compactMap { (kv) -> (Unified.FontDescriptorAttributes.Key,Any)? in
 				let an: Unified.FontDescriptor.AttributeName
 				// FIXME: reject incompatible value types
 				switch kv.key {
