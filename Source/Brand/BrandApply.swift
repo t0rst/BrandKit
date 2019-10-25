@@ -54,7 +54,7 @@ extension Brand
 
 	public enum ContentMode : String, Codable {
 		case center, top, bottom, left, right, topLeft, topRight, bottomLeft, bottomRight
-		// following pairs are synonyms, first is CALayer.contentsGravity, second is UIViewContentMode
+		// following pairs are synonyms, first is CALayer.contentsGravity, second is UIView.ContentMode
 		case resize, scaleToFill
 		case resizeAspect, scaleAspectFit
 		case resizeAspectFill, scaleAspectFill

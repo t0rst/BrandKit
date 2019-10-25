@@ -329,8 +329,7 @@ open class Brand : NSObject
 			case let f as UITextView:
 				f.attributedText = NSAttributedString(string: t ?? f.text ?? "", attributes: ta)
 			case let f as Unified.TextField:
-				let sa = [String:Any](uniqueKeysWithValues: ta.lazy.map({kv in return (kv.key.rawValue, kv.value)}))
-				f.defaultTextAttributes = sa
+				f.defaultTextAttributes = ta
 				f.attributedText = NSAttributedString(string: t ?? f.text ?? "", attributes: ta)
 			default:
 				break
@@ -425,9 +424,9 @@ open class Brand : NSObject
 		return Brand.`default`.buttonStyle(kind)
 	}
 
-	open func applyButtonStyle(_ kind: ButtonStyleKind, to button: Unified.Button, withUpdatedText t: String? = nil, forStates: [UIControlState]? = nil) {
+	open func applyButtonStyle(_ kind: ButtonStyleKind, to button: Unified.Button, withUpdatedText t: String? = nil, forStates: [UIControl.State]? = nil) {
 		let bs = buttonStyle(kind)
-		let states: [UIControlState] = [.normal, .highlighted, .disabled, .selected]
+		let states: [UIControl.State] = [.normal, .highlighted, .disabled, .selected]
 		for state in states {
 			guard nil == forStates || true == forStates?.contains(state) else { continue }
 			guard let style = bs.stateStyles[state] else { continue }

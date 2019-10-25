@@ -63,7 +63,7 @@ extension UIView
 			view.backgroundColor = backgroundColor
 			view.isOpaque = 1 == backgroundColor?.cgColor.alpha
 			if borderWidth != 0, let bgc = borderColor?.cgColor {
-				view.layer.borderWidth = fabs(borderWidth)
+				view.layer.borderWidth = abs(borderWidth)
 				view.layer.borderColor = bgc
 			}
 			if let margins = margins {
@@ -125,7 +125,7 @@ extension UICollectionViewCell
 extension UICollectionViewFlowLayout
 {
 	public struct FlowLayoutBrandingParams {
-		public var scrollDirection:	UICollectionViewScrollDirection = .vertical
+		public var scrollDirection:	UICollectionView.ScrollDirection = .vertical
 		public var itemGap:			CGFloat = 0 // gap in fit direction
 		public var lineGap:			CGFloat = 0 // gap in scroll direction
 		public var header:			CGFloat? = nil // header dimension in scroll direction
@@ -135,13 +135,13 @@ extension UICollectionViewFlowLayout
 		public var itemSize:		CGSize = .zero
 		public var itemCount:		CGSize = .zero
 
-		public init(_ dir: UICollectionViewScrollDirection, _ dim: CGFloat = 0) {
+		public init(_ dir: UICollectionView.ScrollDirection, _ dim: CGFloat = 0) {
 			scrollDirection = dir
 			if dir == .vertical { itemSize.width = dim } else { itemSize.height = dim }
 		}
 
 		public init(_ accessor: BrandParameterAccessor) {
-			scrollDirection = UICollectionViewScrollDirection(accessor.string(at: "scrollDirection") ?? "v") ?? .vertical
+			scrollDirection = UICollectionView.ScrollDirection(accessor.string(at: "scrollDirection") ?? "v") ?? .vertical
 			lineGap = accessor.float(at: "lineGap") ?? 0
 			itemGap = accessor.float(at: "itemGap") ?? 0
 			header = accessor.float(at: "header")
@@ -239,17 +239,17 @@ extension UICollectionView
 extension UIStackView
 {
 	public struct StackViewBrandingParams {
-		public var axis:			UILayoutConstraintAxis? = nil
-		public var alignment:		UIStackViewAlignment? = nil
-		public var distribution:	UIStackViewDistribution? = nil
+		public var axis:			NSLayoutConstraint.Axis? = nil
+		public var alignment:		UIStackView.Alignment? = nil
+		public var distribution:	UIStackView.Distribution? = nil
 		public var clustering:		T0StackViewClustering = .none
 		public var margins:			UIEdgeInsets? = nil
 		public var spacing:			CGFloat? = nil
 		public init(){}
 		public init(_ accessor: BrandParameterAccessor) {
-			axis = UILayoutConstraintAxis(accessor.string(at: "axis") ?? "")
-			alignment = UIStackViewAlignment(accessor.string(at: "alignment") ?? "")
-			distribution = UIStackViewDistribution(accessor.string(at: "distribution") ?? "")
+			axis = NSLayoutConstraint.Axis(accessor.string(at: "axis") ?? "")
+			alignment = UIStackView.Alignment(accessor.string(at: "alignment") ?? "")
+			distribution = UIStackView.Distribution(accessor.string(at: "distribution") ?? "")
 			clustering = T0StackViewClustering(accessor.string(at: "clustering") ?? "") ?? .none
 			margins = accessor.insets(at: "margins")
 			spacing = accessor.float(at: "spacing")

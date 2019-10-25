@@ -924,17 +924,18 @@ extension Brand
 						#elseif os(macOS)
 							return nil
 						#endif
-					case "symbolic":
-						#if os(iOS)
-							an = .symbolic			// == "NSCTFontSymbolicTrait"
-						#elseif os(macOS)
-							return nil
-						#endif
+				//	case "symbolic":
+				//		#if os(iOS)
+				//			an = .symbolic			// == "NSCTFontSymbolicTrait"
+				//		#elseif os(macOS)
+				//			return nil
+				//		#endif
+				//	...moved to be a sub-attribute within value of .traits
 					default:
 						if kv.key.hasPrefix("!") {
-							an = Unified.FontDescriptor.AttributeName(String(kv.key.dropFirst()))
+							an = Unified.FontDescriptor.AttributeName(rawValue: String(kv.key.dropFirst()))
 						} else {
-							an = Unified.FontDescriptor.AttributeName(kv.key)
+							an = Unified.FontDescriptor.AttributeName(rawValue: kv.key)
 							BKLog.error("Unrecognised font attribute \"\(kv.key)\"")
 							reject = true
 						}
@@ -996,7 +997,7 @@ extension Brand
 extension Brand
 {
 	public static let kInvalidTextAttributes: Unified.TextAttributes = [
-		NSAttributedStringKey("invalid") : "invalid"
+		NSAttributedString.Key("invalid") : "invalid"
 	]
 
 	static func resolveTextAttributes(_ entry: BrandData.TextAttributesEntry, into cache: BrandData.TextAttributesEntry.Cache, using others: BrandData) -> Unified.TextAttributes
@@ -1190,7 +1191,7 @@ extension Brand.RelativeDimension
 
 
 extension Brand.ContentMode {
-	public var viewContentMode: UIViewContentMode { switch self {
+	public var viewContentMode: UIView.ContentMode { switch self {
 		case .center:				return .center
 		case .top:					return .top
 		case .bottom:				return .bottom
@@ -1478,7 +1479,7 @@ public struct ButtonStateStyle {
 }
 
 public struct ButtonStyle {
-	public let stateStyles:		[UIControlState:ButtonStateStyle]
+	public let stateStyles:		[UIControl.State:ButtonStateStyle]
 	public let contentInsets:	Unified.EdgeInsets?
 	public let tintColor:		Unified.Color?
 	public let reverseIconSide:	Bool
@@ -1496,14 +1497,14 @@ extension Brand
 
 		var payload = kInvalidButtonStyle
 		cache.set(payload: payload, valid: false)
-		var stateStyles = [UIControlState:ButtonStateStyle]()
+		var stateStyles = [UIControl.State:ButtonStateStyle]()
 		var contentInsets: Unified.EdgeInsets? = nil
 		var tintColor: Unified.Color? = nil
 
 		var dependencies: [(kind: BrandData.Kind, name: String)] = []
 		var errors = false
 
-		func addElements(from elementNames: BrandData.ButtonStyleEntry.StyleElementNames?, for state: UIControlState) {
+		func addElements(from elementNames: BrandData.ButtonStyleEntry.StyleElementNames?, for state: UIControl.State) {
 			guard let names = elementNames
 			else { return }
 
@@ -1615,7 +1616,7 @@ extension Unified.LayoutRelation : Codable
 
 
 
-extension UIControlState : Hashable {
+extension UIControl.State : Hashable {
 	public var hashValue: Int {
 		return rawValue.hashValue
 	}
