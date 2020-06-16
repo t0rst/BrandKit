@@ -1610,6 +1610,10 @@ extension Unified.LayoutRelation : Codable
 			case .lessThanOrEqual:		try container.encode("lessThanOrEqual")
 			case .equal:				try container.encode("equal")
 			case .greaterThanOrEqual:	try container.encode("greaterThanOrEqual")
+			// Because declared as typedef NS_ENUM(NSInteger, NSLayoutRelation) { ...
+			// instead of as typedef NS_CLOSED_ENUM(NSInteger, NSLayoutRelation) { ...
+			@unknown default:			fatalError("")
+			// ...until they fix the declaration.
 		}
 	}
 }

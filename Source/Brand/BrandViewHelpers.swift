@@ -167,26 +167,31 @@ extension UICollectionViewFlowLayout
 			fl.minimumInteritemSpacing = itemGap
 
 			var size = fl.itemSize
-			if let header = header { switch scrollDirection {
-				case .vertical:		fl.headerReferenceSize = CGSize(width: size.width, height: header)
-				case .horizontal:	fl.headerReferenceSize = CGSize(width: header, height: size.height)
+
+			if let header = header { if scrollDirection == .vertical {
+				fl.headerReferenceSize = CGSize(width: size.width, height: header)
+			} else {
+				fl.headerReferenceSize = CGSize(width: header, height: size.height)
 			} }
-			if let footer = footer { switch scrollDirection {
-				case .vertical:		fl.headerReferenceSize = CGSize(width: size.width, height: footer)
-				case .horizontal:	fl.headerReferenceSize = CGSize(width: footer, height: size.height)
+			if let footer = footer { if scrollDirection == .vertical {
+				fl.footerReferenceSize = CGSize(width: size.width, height: footer)
+			} else {
+				fl.footerReferenceSize = CGSize(width: footer, height: size.height)
 			} }
 
 			let sizingRequest = FlowLayoutSizingRequest(sizes: itemSize, counts: itemCount)
 			size = fl.dynamicItemSize(for: sizingRequest)
 			fl.itemSize = size
 
-			if let header = header { switch scrollDirection {
-				case .vertical:		fl.headerReferenceSize = CGSize(width: size.width, height: header)
-				case .horizontal:	fl.headerReferenceSize = CGSize(width: header, height: size.height)
+			if let header = header { if scrollDirection == .vertical {
+				fl.headerReferenceSize = CGSize(width: size.width, height: header)
+			} else {
+				fl.headerReferenceSize = CGSize(width: header, height: size.height)
 			} }
-			if let footer = footer { switch scrollDirection {
-				case .vertical:		fl.headerReferenceSize = CGSize(width: size.width, height: footer)
-				case .horizontal:	fl.headerReferenceSize = CGSize(width: footer, height: size.height)
+			if let footer = footer { if scrollDirection == .vertical {
+				fl.footerReferenceSize = CGSize(width: size.width, height: footer)
+			} else {
+				fl.footerReferenceSize = CGSize(width: footer, height: size.height)
 			} }
 		}
 	}
